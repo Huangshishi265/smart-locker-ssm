@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- ==================== 启用注解扫描（IOC） ==================== -->
+    <!-- 体现Spring的IOC（控制反转）核心技术的应用 -->
+    <!-- 扫描除了Controller以外的所有组件 -->
+    <context:component-scan base-package="com.smartlocker">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- ==================== 加载外部配置文件 ==================== -->
+    <context:property-placeholder location="classpath:database.properties"/>
+
+    <!-- ==================== 数据源配置 ==================== -->
+    <!-- 使用Druid连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialSize" value="5"/>
+        <property name="minIdle" value="5"/>
+        <property name="maxActive" value="20"/>
+        <property name="maxWait" value="60000"/>
+    </bean>
+
+    <!-- ==================== MyBatis整合配置 ==================== -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 指定Mapper XML文件位置 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <!-- 指定实体类包路径（别名） -->
+        <property name="typeAliasesPackage" value="com.smartlocker.entity"/>
+    </bean>
+
+    <!-- ==================== Mapper扫描配置 ==================== -->
+    <!-- 扫描DAO接口，自动生成代理对象 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.smartlocker.dao"/>
+    </bean>
+
+    <!-- ==================== 事务管理器 ==================== -->
+    <!-- 体现Spring的事务管理能力，结合AOP实现声明式事务 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- ==================== 启用事务注解（AOP） ==================== -->
+    <!-- 体现AOP（面向切面编程）核心技术的应用 -->
+    <!-- 通过@Transactional注解实现声明式事务管理 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- ==================== 启用AOP注解 ==================== -->
+    <!-- 体现AOP（面向切面编程）核心技术的应用 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+</beans>

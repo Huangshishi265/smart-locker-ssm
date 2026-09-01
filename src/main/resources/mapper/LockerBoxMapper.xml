@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smartlocker.dao.LockerBoxDao">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.smartlocker.entity.LockerBox">
+        <id column="id" property="id"/>
+        <result column="locker_id" property="lockerId"/>
+        <result column="box_code" property="boxCode"/>
+        <result column="box_size" property="boxSize"/>
+        <result column="status" property="status"/>
+        <result column="delivery_id" property="deliveryId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, locker_id, box_code, box_size, status, delivery_id, create_time, update_time
+    </sql>
+
+    <!-- 根据快递柜ID查询所有柜格 -->
+    <select id="selectByLockerId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_locker_box
+        WHERE locker_id = #{lockerId}
+        ORDER BY box_code
+    </select>
+
+    <!-- 根据ID查询柜格 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_locker_box
+        WHERE id = #{id}
+    </select>
+
+    <!-- 查询可用的柜格（空闲状态） -->
+    <select id="selectAvailableBoxes" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_locker_box
+        WHERE locker_id = #{lockerId}
+        AND status = 0
+        <if test="boxSize != null">
+            AND box_size = #{boxSize}
+        </if>
+        ORDER BY box_code
+    </select>
+
+    <!-- 插入柜格 -->
+    <insert id="insert" parameterType="com.smartlocker.entity.LockerBox" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_locker_box (locker_id, box_code, box_size, status, create_time, update_time)
+        VALUES (#{lockerId}, #{boxCode}, #{boxSize}, #{status}, NOW(), NOW())
+    </insert>
+
+    <!-- 批量插入柜格 -->
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_locker_box (locker_id, box_code, box_size, status, create_time, update_time)
+        VALUES
+        <foreach collection="boxes" item="box" separator=",">
+            (#{box.lockerId}, #{box.boxCode}, #{box.boxSize}, #{box.status}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+    <!-- 更新柜格状态 -->
+    <update id="updateStatus">
+        UPDATE t_locker_box
+        SET status = #{status},
+        update_time = NOW()
+        <if test="deliveryId != null">
+            , delivery_id = #{deliveryId}
+        </if>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除柜格 -->
+    <delete id="deleteById">
+        DELETE FROM t_locker_box WHERE id = #{id}
+    </delete>
+
+    <!-- 根据快递柜ID删除所有柜格 -->
+    <delete id="deleteByLockerId">
+        DELETE FROM t_locker_box WHERE locker_id = #{lockerId}
+    </delete>
+
+    <!-- 统计快递柜的柜格数量 -->
+    <select id="countByLockerId" resultType="int">
+        SELECT COUNT(*) FROM t_locker_box WHERE locker_id = #{lockerId}
+    </select>
+
+    <!-- 统计快递柜的可用柜格数量 -->
+    <select id="countAvailableByLockerId" resultType="int">
+        SELECT COUNT(*) FROM t_locker_box
+        WHERE locker_id = #{lockerId} AND status = 0
+    </select>
+
+</mapper>

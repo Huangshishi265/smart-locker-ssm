@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smartlocker.dao.LockerDao">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.smartlocker.entity.Locker">
+        <id column="id" property="id"/>
+        <result column="locker_name" property="lockerName"/>
+        <result column="location" property="location"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 柜格结果映射 -->
+    <resultMap id="LockerBoxResultMap" type="com.smartlocker.entity.LockerBox">
+        <id column="id" property="id"/>
+        <result column="locker_id" property="lockerId"/>
+        <result column="box_code" property="boxCode"/>
+        <result column="box_size" property="boxSize"/>
+        <result column="status" property="status"/>
+        <result column="delivery_id" property="deliveryId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, locker_name, location, description, status, create_time, update_time
+    </sql>
+
+    <!-- 查询所有快递柜 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_locker
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 多条件查询快递柜 -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_locker
+        <where>
+            <if test="lockerName != null and lockerName != ''">
+                AND locker_name LIKE CONCAT('%', #{lockerName}, '%')
+            </if>
+            <if test="location != null and location != ''">
+                AND location LIKE CONCAT('%', #{location}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <!-- ✅ 移除了lockerStatus和repairStatus条件（数据库中不存在这些字段） -->
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询快递柜 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_locker
+        WHERE id = #{id}
+    </select>
+
+    <!-- 查询快递柜的柜格列表 -->
+    <select id="selectBoxesByLockerId" resultMap="LockerBoxResultMap">
+        SELECT id, locker_id, box_code, box_size, status, delivery_id, create_time, update_time
+        FROM t_locker_box
+        WHERE locker_id = #{lockerId}
+        ORDER BY box_code
+    </select>
+
+    <!-- 统计快递柜柜格状态 -->
+    <select id="selectBoxStats" resultType="java.util.Map">
+        SELECT
+        COUNT(*) as totalBoxes,
+        SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as availableBoxes,
+        SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as occupiedBoxes,
+        SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) as brokenBoxes
+        FROM t_locker_box
+        WHERE locker_id = #{lockerId}
+    </select>
+
+    <!-- 插入快递柜 -->
+    <insert id="insert" parameterType="com.smartlocker.entity.Locker" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_locker (locker_name, location, description, status, create_time, update_time)
+        VALUES (#{lockerName}, #{location}, #{description}, #{status}, NOW(), NOW())
+    </insert>
+
+    <!-- 更新快递柜 -->
+    <update id="update" parameterType="com.smartlocker.entity.Locker">
+        UPDATE t_locker
+        <set>
+            <if test="lockerName != null">locker_name = #{lockerName},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新快递柜状态 -->
+    <update id="updateStatus">
+        UPDATE t_locker
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除快递柜 -->
+    <delete id="deleteById">
+        DELETE FROM t_locker WHERE id = #{id}
+    </delete>
+
+    <!-- 统计各状态的快递柜数量 -->
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM t_locker
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    <!-- ✅ 移除了countByRepairStatus方法 -->
+
+</mapper>

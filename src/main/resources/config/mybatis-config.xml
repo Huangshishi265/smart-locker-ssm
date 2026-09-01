@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- 全局配置 -->
+    <settings>
+        <!-- 开启驼峰命名自动映射：user_name -> userName -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 开启二级缓存 -->
+        <setting name="cacheEnabled" value="true"/>
+        <!-- 日志实现 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+    <!-- 类型别名 -->
+    <typeAliases>
+        <!-- 实体类别名 -->
+        <typeAlias type="com.smartlocker.entity.User" alias="User"/>
+        <typeAlias type="com.smartlocker.entity.Package" alias="Package"/>
+        <typeAlias type="com.smartlocker.entity.Locker" alias="Locker"/>
+        <typeAlias type="com.smartlocker.entity.Box" alias="Box"/>
+        <!-- DTO类别名 -->
+        <typeAlias type="com.smartlocker.dto.PackageDetail" alias="PackageDetail"/>
+        <typeAlias type="com.smartlocker.dto.BoxDetail" alias="BoxDetail"/>
+    </typeAliases>
+
+</configuration>

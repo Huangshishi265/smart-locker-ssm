@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smartlocker.dao.BoxDao">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.smartlocker.entity.Box">
+        <id column="id" property="id"/>
+        <result column="locker_id" property="lockerId"/>
+        <result column="box_number" property="boxNumber"/>
+        <result column="box_size" property="boxSize"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 储物格详细信息结果映射（多表关联查询：t_box, t_locker, t_package） -->
+    <resultMap id="BoxDetailMap" type="com.smartlocker.dto.BoxDetail">
+        <id column="id" property="id"/>
+        <result column="locker_id" property="lockerId"/>
+        <result column="box_number" property="boxNumber"/>
+        <result column="box_size" property="boxSize"/>
+        <result column="status" property="status"/>
+        <result column="status_desc" property="statusDesc"/>
+        <result column="locker_name" property="lockerName"/>
+        <result column="locker_location" property="lockerLocation"/>
+        <result column="package_id" property="packageId"/>
+        <result column="package_no" property="packageNo"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, locker_id, box_number, box_size, status, create_time, update_time
+    </sql>
+
+    <!-- 查询所有储物格 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_box
+        ORDER BY locker_id, box_number
+    </select>
+
+    <!-- 根据ID查询储物格 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_box
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据快递柜ID查询储物格 -->
+    <select id="selectByLockerId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_box
+        WHERE locker_id = #{lockerId}
+        ORDER BY box_number
+    </select>
+
+    <!-- 查询可用的储物格（指定快递柜和尺寸） -->
+    <select id="selectAvailableByLockerIdAndSize" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_box
+        WHERE locker_id = #{lockerId}
+        AND box_size = #{boxSize}
+        AND status = 1
+        ORDER BY box_number
+        LIMIT 1
+    </select>
+
+    <!-- 查询所有可用的储物格（状态为空闲，返回详细信息） -->
+    <select id="selectAvailableBoxes" resultMap="BoxDetailMap">
+        SELECT
+        b.id,
+        b.locker_id,
+        b.box_number,
+        b.box_size,
+        b.status,
+        CASE b.status
+        WHEN 1 THEN '空闲'
+        WHEN 2 THEN '占用'
+        WHEN 0 THEN '禁用'
+        ELSE '未知'
+        END AS status_desc,
+        l.locker_name,
+        l.location AS locker_location,
+        NULL AS package_id,
+        NULL AS package_no,
+        NULL AS receiver_name,
+        b.create_time,
+        b.update_time
+        FROM t_box b
+        LEFT JOIN t_locker l ON b.locker_id = l.id
+        WHERE b.status = 1
+        ORDER BY b.locker_id, b.box_number
+    </select>
+
+    <!-- 插入储物格 -->
+    <insert id="insert" parameterType="com.smartlocker.entity.Box" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_box (locker_id, box_number, box_size, status, create_time, update_time)
+        VALUES (#{lockerId}, #{boxNumber}, #{boxSize}, #{status}, NOW(), NOW())
+    </insert>
+
+    <!-- 更新储物格 -->
+    <update id="update" parameterType="com.smartlocker.entity.Box">
+        UPDATE t_box
+        <set>
+            <if test="lockerId != null">locker_id = #{lockerId},</if>
+            <if test="boxNumber != null">box_number = #{boxNumber},</if>
+            <if test="boxSize != null">box_size = #{boxSize},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除储物格 -->
+    <delete id="deleteById">
+        DELETE FROM t_box WHERE id = #{id}
+    </delete>
+
+    <!-- 查询储物格详细信息（多表关联查询：t_box, t_locker, t_package） -->
+    <select id="selectBoxDetails" resultMap="BoxDetailMap">
+        SELECT
+        b.id,
+        b.locker_id,
+        b.box_number,
+        b.box_size,
+        b.status,
+        CASE b.status
+        WHEN 1 THEN '空闲'
+        WHEN 2 THEN '占用'
+        WHEN 0 THEN '禁用'
+        ELSE '未知'
+        END AS status_desc,
+        l.locker_name,
+        l.location AS locker_location,
+        p.id AS package_id,
+        p.package_no,
+        p.receiver_name,
+        b.create_time,
+        b.update_time
+        FROM t_box b
+        LEFT JOIN t_locker l ON b.locker_id = l.id
+        LEFT JOIN t_package p ON b.id = p.box_id AND p.status = 1
+        ORDER BY l.id, b.box_number
+    </select>
+
+    <!-- 根据ID查询储物格详细信息 -->
+    <select id="selectBoxDetailById" resultMap="BoxDetailMap">
+        SELECT
+        b.id,
+        b.locker_id,
+        b.box_number,
+        b.box_size,
+        b.status,
+        CASE b.status
+        WHEN 1 THEN '空闲'
+        WHEN 2 THEN '占用'
+        WHEN 0 THEN '禁用'
+        ELSE '未知'
+        END AS status_desc,
+        l.locker_name,
+        l.location AS locker_location,
+        p.id AS package_id,
+        p.package_no,
+        p.receiver_name,
+        b.create_time,
+        b.update_time
+        FROM t_box b
+        LEFT JOIN t_locker l ON b.locker_id = l.id
+        LEFT JOIN t_package p ON b.id = p.box_id AND p.status = 1
+        WHERE b.id = #{id}
+    </select>
+
+</mapper>
