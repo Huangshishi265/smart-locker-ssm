@@ -140,9 +140,92 @@
             background: #218838;
         }
 
+        .btn-take {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-take:hover {
+            background: #138496;
+        }
+
+        .btn-notice {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .btn-notice:hover {
+            background: #5a32a3;
+        }
+
+        .modal-mask {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-box textarea {
+            width: 100%;
+            min-height: 180px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .modal-box .modal-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
         .actions {
             display: flex;
             gap: 5px;
+        }
+
+        .alert {
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -156,6 +239,13 @@
         <div style="margin-bottom: 20px;">
             <a href="${pageContext.request.contextPath}/packages/add" class="btn btn-add">+ 新增快递</a>
         </div>
+
+        <c:if test="${not empty success}">
+            <div class="alert alert-success">✅ ${success}</div>
+        </c:if>
+        <c:if test="${not empty error}">
+            <div class="alert alert-error">⚠️ ${error}</div>
+        </c:if>
 
         <div class="table-container">
             <table>
@@ -199,6 +289,11 @@
                                 <fmt:formatDate value="${pkg.putInTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                             </td>
                             <td class="actions">
+                                <c:if test="${pkg.status == 1}">
+                                    <a href="${pageContext.request.contextPath}/packages/take/${pkg.id}" class="btn btn-take"
+                                       onclick="return confirm('确认取件 ${pkg.packageNo} 吗？')">取件</a>
+                                    <button type="button" class="btn btn-notice" onclick="generateNotice(${pkg.id})">生成通知</button>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/packages/edit/${pkg.id}" class="btn btn-edit">编辑</a>
                                 <a href="${pageContext.request.contextPath}/packages/delete/${pkg.id}" class="btn btn-delete"
                                    onclick="return confirm('确定要删除快递 ${pkg.packageNo} 吗？')">删除</a>
@@ -209,5 +304,47 @@
             </table>
         </div>
     </div>
+
+    <!-- 取件通知弹窗 -->
+    <div class="modal-mask" id="noticeModal">
+        <div class="modal-box">
+            <h3>📋 取件通知文案</h3>
+            <textarea id="noticeContent" readonly></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-edit" onclick="copyNotice()">复制</button>
+                <button class="btn btn-delete" onclick="closeNotice()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var noticeText = '';
+
+        function generateNotice(id) {
+            fetch('${pageContext.request.contextPath}/assistant/notice/' + id, { method: 'POST' })
+                .then(function(resp) { return resp.json(); })
+                .then(function(data) {
+                    noticeText = data.notice || '生成失败';
+                    document.getElementById('noticeContent').value = noticeText;
+                    document.getElementById('noticeModal').style.display = 'flex';
+                })
+                .catch(function() {
+                    noticeText = '网络异常，请稍后再试。';
+                    document.getElementById('noticeContent').value = noticeText;
+                    document.getElementById('noticeModal').style.display = 'flex';
+                });
+        }
+
+        function closeNotice() {
+            document.getElementById('noticeModal').style.display = 'none';
+        }
+
+        function copyNotice() {
+            var textarea = document.getElementById('noticeContent');
+            textarea.select();
+            document.execCommand('copy');
+            alert('已复制到剪贴板');
+        }
+    </script>
 </body>
 </html>

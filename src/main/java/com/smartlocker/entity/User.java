@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String email;         // 邮箱
     private String address;       // 地址
     private String avatar;        // 头像路径
+    private Integer role;         // 角色：1-管理员，2-普通用户
     private Integer status;       // 状态：1-正常，0-禁用
     private Date createTime;     // 创建时间
     private Date updateTime;      // 更新时间
@@ -86,6 +87,14 @@ public class User implements Serializable {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 
     public Integer getStatus() {

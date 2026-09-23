@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smartlocker.dao.AiChatLogDao">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.smartlocker.entity.AiChatLog">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="question" property="question"/>
+        <result column="answer" property="answer"/>
+        <result column="answer_source" property="answerSource"/>
+        <result column="is_transferred" property="isTransferred"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, phone, question, answer, answer_source, is_transferred, create_time
+    </sql>
+
+    <!-- 插入对话日志 -->
+    <insert id="insert" parameterType="com.smartlocker.entity.AiChatLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_chat_log (phone, question, answer, answer_source, is_transferred, create_time)
+        VALUES (#{phone}, #{question}, #{answer}, #{answerSource}, #{isTransferred}, NOW())
+    </insert>
+
+    <!-- 查询最近 N 条对话日志 -->
+    <select id="selectRecent" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ai_chat_log
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

@@ -55,4 +55,9 @@ public interface PackageDao {
      * 根据ID查询快递详细信息
      */
     PackageDetail selectPackageDetailById(@Param("id") Long id);
+
+    /**
+     * 根据收件人手机号查询快递详细信息（供 AI 客服检索使用）
+     */
+    List<PackageDetail> selectPackageDetailsByPhone(@Param("phone") String phone);
 }

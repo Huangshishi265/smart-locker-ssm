@@ -60,4 +60,9 @@ public interface BoxDao {
      * 根据ID查询储物格详细信息
      */
     BoxDetail selectBoxDetailById(@Param("id") Long id);
+
+    /**
+     * 统计快递柜的储物格状态
+     */
+    java.util.Map<String, Object> selectBoxStats(@Param("lockerId") Long lockerId);
 }

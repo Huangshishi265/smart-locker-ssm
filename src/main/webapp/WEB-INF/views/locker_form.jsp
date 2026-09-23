@@ -155,6 +155,13 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">详细地址</label>
+                    <input type="text" class="form-control" name="address"
+                           value="${not empty locker ? locker.address : ''}"
+                           placeholder="请输入详细地址">
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">描述</label>
                     <textarea class="form-control" name="description"
                               placeholder="请输入描述信息">${not empty locker ? locker.description : ''}</textarea>
@@ -168,6 +175,31 @@
                     </select>
                 </div>
             </div>
+
+            <!-- 柜格配置（仅新增时配置，自动初始化柜格） -->
+            <c:if test="${empty locker.id}">
+            <div class="form-section">
+                <h4>柜格配置（自动初始化）</h4>
+                <div class="form-group">
+                    <label class="form-label">小柜数量（A 系列）</label>
+                    <input type="number" class="form-control" name="smallCount" min="0" value="4"
+                           placeholder="请输入小型柜格数量，如 4">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">中柜数量（B 系列）</label>
+                    <input type="number" class="form-control" name="mediumCount" min="0" value="4"
+                           placeholder="请输入中型柜格数量，如 4">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">大柜数量（C 系列）</label>
+                    <input type="number" class="form-control" name="largeCount" min="0" value="2"
+                           placeholder="请输入大型柜格数量，如 2">
+                </div>
+                <div class="text-muted" style="font-size: 13px;">
+                    系统将自动生成编号为 A1..、B1..、C1.. 的柜格，默认状态为「空闲」。
+                </div>
+            </div>
+            </c:if>
 
             <!-- 操作按钮 -->
             <div style="display: flex; gap: 15px; justify-content: center;">

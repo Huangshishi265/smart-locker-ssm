@@ -178,4 +178,15 @@
         WHERE b.id = #{id}
     </select>
 
+    <!-- 统计快递柜储物格状态 -->
+    <select id="selectBoxStats" resultType="java.util.Map">
+        SELECT
+        COUNT(*) AS totalBoxes,
+        SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS availableBoxes,
+        SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS occupiedBoxes,
+        SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS brokenBoxes
+        FROM t_box
+        WHERE locker_id = #{lockerId}
+    </select>
+
 </mapper>

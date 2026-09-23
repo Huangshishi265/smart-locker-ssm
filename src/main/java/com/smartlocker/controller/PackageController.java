@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -90,6 +91,20 @@ public class PackageController {
     @RequestMapping("/packages/delete/{id}")
     public String delete(@PathVariable Long id) {
         packageService.deletePackage(id);
+        return "redirect:/packages";
+    }
+
+    /**
+     * 取件：用户取件，释放储物格
+     */
+    @RequestMapping("/packages/take/{id}")
+    public String take(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            packageService.takePackage(id);
+            redirectAttributes.addFlashAttribute("success", "取件成功！");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "取件失败：" + e.getMessage());
+        }
         return "redirect:/packages";
     }
 }

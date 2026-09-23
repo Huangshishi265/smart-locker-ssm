@@ -206,6 +206,20 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">角色</label>
+                <div>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" name="role" value="1"
+                               ${not empty user && user.role == 1 ? 'checked' : ''}> 管理员
+                    </label>
+                    <label>
+                        <input type="radio" name="role" value="2"
+                               ${empty user || user.role == 2 ? 'checked' : ''}> 普通用户
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">状态</label>
                 <div>
                     <label style="margin-right: 20px;">

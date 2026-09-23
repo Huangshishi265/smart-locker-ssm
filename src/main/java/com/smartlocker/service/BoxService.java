@@ -44,4 +44,9 @@ public interface BoxService {
      * 删除储物格
      */
     void deleteBox(Long id);
+
+    /**
+     * 查询快递柜储物格统计信息
+     */
+    java.util.Map<String, Object> getBoxStats(Long lockerId);
 }

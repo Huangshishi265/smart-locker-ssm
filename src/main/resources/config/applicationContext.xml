@@ -13,11 +13,11 @@
        http://www.springframework.org/schema/aop
        http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <!-- IOC组件扫描：扫描Service、DAO等组件 -->
-    <context:component-scan base-package="com.smartlocker.service,com.smartlocker.dao,com.smartlocker.aspect"/>
+    <!-- IOC组件扫描：扫描Service、DAO、AI等组件 -->
+    <context:component-scan base-package="com.smartlocker.service,com.smartlocker.dao,com.smartlocker.aspect,com.smartlocker.ai"/>
 
-    <!-- 加载JDBC配置文件 -->
-    <context:property-placeholder location="classpath:config/jdbc.properties"/>
+    <!-- 加载JDBC与AI配置文件 -->
+    <context:property-placeholder location="classpath:config/jdbc.properties,classpath:config/ai.properties"/>
 
     <!-- 数据源配置（使用Druid连接池） -->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">

@@ -559,6 +559,9 @@
                 <a href="${pageContext.request.contextPath}/users" class="nav-item">
                     <i class="fas fa-users"></i> 用户管理
                 </a>
+                <a href="${pageContext.request.contextPath}/assistant" class="nav-item">
+                    <i class="fas fa-robot"></i> AI 客服
+                </a>
             </div>
         </div>
     </nav>
@@ -568,14 +571,15 @@
             <!-- 欢迎横幅 -->
             <div class="hero-section">
                 <h1 class="hero-title">智能快递柜管理系统</h1>
-                <p class="hero-subtitle">基于AI技术的智能物流解决方案，重新定义快递存取体验</p>
+                <p class="hero-subtitle">快递存取全流程数字化管理，数据真实、流程闭环</p>
                 <p class="hero-description">
-                    本系统采用最先进的人工智能算法与物联网技术，实现快递柜的智能化管理、自动化分拣和预测性维护。
-                    通过大数据分析和机器学习，优化存储空间利用率，提升用户满意度，降低运营成本。
+                    系统覆盖快递入库、柜格自动分配、用户取件、故障报修与维修等完整业务流程。
+                    首页所有统计数字均来自数据库实时计算，杜绝假数据；
+                    AI 智能客服让用户输入手机号即可查询快递、一键生成取件通知文案。
                 </p>
                 <div class="ai-badge">
                     <i class="fas fa-brain"></i>
-                    <span>AI智能引擎实时运行中</span>
+                    <span>AI 智能客服 · 数据实时统计</span>
                 </div>
             </div>
 
@@ -643,45 +647,45 @@
                     </div>
                     <div class="realtime-grid">
                         <div class="realtime-item">
-                            <div class="realtime-label">当前取件数</div>
-                            <div class="realtime-value">187</div>
+                            <div class="realtime-label">待取件快递</div>
+                            <div class="realtime-value">${stats.pendingPackages}</div>
                             <div class="realtime-trend positive">
-                                较昨日 +12.5%
+                                需用户及时取件
                             </div>
                         </div>
                         <div class="realtime-item">
-                            <div class="realtime-label">平均取件时间</div>
-                            <div class="realtime-value">23.4s</div>
+                            <div class="realtime-label">今日新增快递</div>
+                            <div class="realtime-value">${stats.todayPackages}</div>
                             <div class="realtime-trend positive">
-                                效率提升 18.7%
+                                实时统计
                             </div>
                         </div>
                         <div class="realtime-item">
-                            <div class="realtime-label">系统运行时长</div>
-                            <div class="realtime-value">45天</div>
+                            <div class="realtime-label">在线快递柜</div>
+                            <div class="realtime-value">${stats.onlineLockers}</div>
                             <div class="realtime-trend positive">
-                                稳定性 99.92%
+                                共 ${stats.lockerCount} 台
                             </div>
                         </div>
                         <div class="realtime-item">
-                            <div class="realtime-label">AI预测准确率</div>
-                            <div class="realtime-value">96.8%</div>
+                            <div class="realtime-label">可用柜格</div>
+                            <div class="realtime-value">${stats.availableBoxes}</div>
                             <div class="realtime-trend positive">
-                                持续优化中
+                                共 ${stats.boxCount} 格
                             </div>
                         </div>
                         <div class="realtime-item">
-                            <div class="realtime-label">今日存件数</div>
-                            <div class="realtime-value">342</div>
+                            <div class="realtime-label">柜格使用率</div>
+                            <div class="realtime-value">${stats.boxUsageRate}%</div>
                             <div class="realtime-trend positive">
-                                较昨日 +8.3%
+                                占用 ${stats.occupiedBoxes} 格
                             </div>
                         </div>
                         <div class="realtime-item">
-                            <div class="realtime-label">格口使用率</div>
-                            <div class="realtime-value">78.5%</div>
+                            <div class="realtime-label">活跃用户</div>
+                            <div class="realtime-value">${stats.activeUsers}</div>
                             <div class="realtime-trend positive">
-                                优化空间 15.2%
+                                共 ${stats.userCount} 人
                             </div>
                         </div>
                     </div>
@@ -694,11 +698,31 @@
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
+                            <i class="fas fa-box-open"></i>
                         </div>
-                        <div class="feature-title">智能分拣</div>
+                        <div class="feature-title">快递存取闭环</div>
                         <div class="feature-description">
-                            基于AI算法的智能分拣系统，自动识别快递尺寸并分配最优储物格，提高空间利用率30%以上。
+                            快递入库自动分配空闲柜格，用户取件释放柜格，全流程状态可追溯，形成完整业务闭环。
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <div class="feature-title">智能柜格管理</div>
+                        <div class="feature-description">
+                            小/中/大三种规格柜格自动初始化与分配，实时统计空闲、占用与禁用柜格数量。
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <div class="feature-title">故障报修追踪</div>
+                        <div class="feature-description">
+                            报修→维修→完成全流程记录，故障状态实时可见，维修人员与时间全程可追踪。
                         </div>
                     </div>
 
@@ -706,47 +730,27 @@
                         <div class="feature-icon">
                             <i class="fas fa-shield-alt"></i>
                         </div>
-                        <div class="feature-title">安全防护</div>
+                        <div class="feature-title">登录与权限</div>
                         <div class="feature-description">
-                            多重身份验证与实时监控系统，结合区块链技术确保存取记录不可篡改，提供银行级安全保障。
+                            登录拦截器统一鉴权，未登录无法访问后台，管理员与普通用户角色区分。
                         </div>
                     </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="feature-title">预测分析</div>
-                        <div class="feature-description">
-                            利用大数据分析预测存取高峰时段，提前调配资源，减少用户等待时间，优化运营效率。
-                        </div>
-                    </div>
-
                     <div class="feature-card">
                         <div class="feature-icon">
                             <i class="fas fa-robot"></i>
                         </div>
-                        <div class="feature-title">AI助手</div>
+                        <div class="feature-title">AI 智能客服</div>
                         <div class="feature-description">
-                            集成智能语音助手与图像识别，支持无接触式操作和异常行为检测，提供全天候智能服务。
+                            输入手机号即可查询快递状态，一键生成取件通知文案；模型失败自动降级为模板话术。
                         </div>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">
-                            <i class="fas fa-cloud"></i>
+                            <i class="fas fa-chart-bar"></i>
                         </div>
-                        <div class="feature-title">云端同步</div>
+                        <div class="feature-title">真实数据看板</div>
                         <div class="feature-description">
-                            所有数据实时同步到云端，支持多终端访问和管理，确保数据安全与一致性。
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div class="feature-title">移动端管理</div>
-                        <div class="feature-description">
-                            提供完整的移动端管理应用，随时随地查看快递状态、管理储物格和监控系统运行。
+                            首页统计数字全部来自数据库实时计算，杜绝假数据，真实反映系统运行状态。
                         </div>
                     </div>
                 </div>
@@ -764,60 +768,6 @@
                 navbar.classList.remove('scrolled');
             }
         });
-
-        // 模拟实时数据更新效果
-        function updateRealtimeData() {
-            const realtimeValues = document.querySelectorAll('.realtime-value');
-
-            // 只更新数字部分，不更新单位
-            realtimeValues.forEach(el => {
-                const text = el.textContent;
-                const match = text.match(/(\d+\.?\d*)/);
-
-                if (match) {
-                    const currentValue = parseFloat(match[1]);
-                    const unit = text.replace(match[1], '');
-
-                    // 根据数据类型进行不同的随机波动
-                    let newValue;
-                    if (el.parentElement.querySelector('.realtime-label').textContent.includes('取件数') ||
-                        el.parentElement.querySelector('.realtime-label').textContent.includes('存件数')) {
-                        // 取件/存件数：小幅随机增减
-                        const change = Math.floor(Math.random() * 6) - 2; // -2 到 +3
-                        newValue = Math.max(0, currentValue + change);
-                    } else if (el.parentElement.querySelector('.realtime-label').textContent.includes('时间')) {
-                        // 时间：小幅随机变化
-                        const change = (Math.random() * 0.4) - 0.2; // -0.2 到 +0.2
-                        newValue = Math.max(0.1, currentValue + change);
-                        newValue = newValue.toFixed(1);
-                    } else if (el.parentElement.querySelector('.realtime-label').textContent.includes('使用率') ||
-                               el.parentElement.querySelector('.realtime-label').textContent.includes('准确率')) {
-                        // 百分比：极小变化
-                        const change = (Math.random() * 0.2) - 0.1; // -0.1 到 +0.1
-                        newValue = Math.max(0, Math.min(100, currentValue + change));
-                        newValue = newValue.toFixed(1);
-                    } else {
-                        // 其他数据：保持原值
-                        newValue = currentValue;
-                    }
-
-                    // 添加动画效果
-                    el.style.transform = 'scale(1.1)';
-                    el.style.color = '#00aaff';
-
-                    setTimeout(() => {
-                        el.textContent = newValue + unit;
-                        el.style.transform = 'scale(1)';
-                        setTimeout(() => {
-                            el.style.color = '';
-                        }, 300);
-                    }, 200);
-                }
-            });
-        }
-
-        // 每8秒更新一次实时数据
-        setInterval(updateRealtimeData, 8000);
 
         // 卡片悬停效果增强
         document.querySelectorAll('.stat-card, .feature-card, .realtime-item').forEach(card => {
@@ -851,9 +801,6 @@
                     card.style.transform = 'translateY(0)';
                 }, 100 + index * 80);
             });
-
-            // 初始化实时数据
-            updateRealtimeData();
         });
 
         // 导航菜单激活状态

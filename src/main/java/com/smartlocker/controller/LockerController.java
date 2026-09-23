@@ -1,7 +1,8 @@
 package com.smartlocker.controller;
 
+import com.smartlocker.entity.Box;
 import com.smartlocker.entity.Locker;
-import com.smartlocker.entity.LockerBox;
+import com.smartlocker.entity.User;
 import com.smartlocker.service.LockerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,7 @@ public class LockerController {
         model.addAttribute("locker", locker);
 
         // 获取柜格列表
-        List<LockerBox> boxes = lockerService.getLockerBoxes(id);
+        List<Box> boxes = lockerService.getLockerBoxes(id);
         model.addAttribute("boxes", boxes);
 
         // 获取柜格统计
@@ -207,12 +209,20 @@ public class LockerController {
 
     /**
      * 故障维修：完成维修
+     * operatorId 可选：未传时默认取当前登录用户作为维修人员
      */
     @RequestMapping("/repair/complete/{id}")
     public String completeRepair(@PathVariable Long id,
-                                 @RequestParam Long operatorId,
+                                 @RequestParam(required = false) Long operatorId,
+                                 HttpSession session,
                                  RedirectAttributes redirectAttributes) {
         try {
+            if (operatorId == null) {
+                User user = (User) session.getAttribute("user");
+                if (user != null) {
+                    operatorId = user.getId();
+                }
+            }
             lockerService.completeRepair(id, operatorId);
             redirectAttributes.addFlashAttribute("success", "维修完成！");
         } catch (Exception e) {

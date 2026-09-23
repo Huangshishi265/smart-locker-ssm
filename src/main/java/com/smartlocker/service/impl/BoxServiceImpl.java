@@ -97,4 +97,9 @@ public class BoxServiceImpl implements BoxService {
 
         boxDao.deleteById(id);
     }
+
+    @Override
+    public java.util.Map<String, Object> getBoxStats(Long lockerId) {
+        return boxDao.selectBoxStats(lockerId);
+    }
 }

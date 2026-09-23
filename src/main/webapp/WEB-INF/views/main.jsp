@@ -351,7 +351,7 @@
                     <i class="bi bi-box2"></i>
                     <span>快递列表</span>
                 </a>
-                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/packages/form')">
+                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/packages/add')">
                     <i class="bi bi-plus-circle"></i>
                     <span>快递入库</span>
                 </a>
@@ -361,7 +361,7 @@
                     <i class="bi bi-grid"></i>
                     <span>储物格列表</span>
                 </a>
-                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/boxes/form')">
+                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/boxes/add')">
                     <i class="bi bi-plus-square"></i>
                     <span>新增储物格</span>
                 </a>
@@ -371,7 +371,7 @@
                     <i class="bi bi-building"></i>
                     <span>快递柜列表</span>
                 </a>
-                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/lockers/form')">
+                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/lockers/add')">
                     <i class="bi bi-plus-lg"></i>
                     <span>新增快递柜</span>
                 </a>
@@ -381,13 +381,19 @@
                     <i class="bi bi-people"></i>
                     <span>用户管理</span>
                 </a>
-                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/users/form')">
+                <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/users/add')">
                     <i class="bi bi-person-plus"></i>
                     <span>新增用户</span>
                 </a>
                 <a href="javascript:void(0)" class="menu-item" onclick="loadPage('/users/register')">
                     <i class="bi bi-person-lines-fill"></i>
                     <span>用户注册</span>
+                </a>
+
+                <div class="menu-category">智能服务</div>
+                <a href="${pageContext.request.contextPath}/assistant" class="menu-item" target="_blank">
+                    <i class="bi bi-robot"></i>
+                    <span>AI 智能客服</span>
                 </a>
             </div>
         </aside>
@@ -410,6 +416,10 @@
                     <a href="${pageContext.request.contextPath}/" class="nav-item">
                         <i class="bi bi-house"></i>
                         <span>首页</span>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/assistant" class="nav-item" target="_blank">
+                        <i class="bi bi-robot"></i>
+                        <span>AI 客服</span>
                     </a>
                     <a href="${pageContext.request.contextPath}/logout" class="nav-item logout">
                         <i class="bi bi-box-arrow-right"></i>
@@ -434,16 +444,16 @@
         // 页面标题映射
         const pageTitles = {
             '/packages': { title: '快递列表', desc: '查看和管理所有快递信息' },
-            '/packages/form': { title: '快递入库', desc: '录入新的快递信息' },
+            '/packages/add': { title: '快递入库', desc: '录入新的快递信息' },
             '/packages/edit': { title: '编辑快递', desc: '修改快递信息' },
             '/boxes': { title: '储物格列表', desc: '查看和管理所有储物格' },
-            '/boxes/form': { title: '新增储物格', desc: '添加新的储物格' },
+            '/boxes/add': { title: '新增储物格', desc: '添加新的储物格' },
             '/boxes/edit': { title: '编辑储物格', desc: '修改储物格信息' },
             '/lockers': { title: '快递柜列表', desc: '查看和管理所有快递柜' },
-            '/lockers/form': { title: '新增快递柜', desc: '添加新的快递柜' },
+            '/lockers/add': { title: '新增快递柜', desc: '添加新的快递柜' },
             '/lockers/edit': { title: '编辑快递柜', desc: '修改快递柜信息' },
             '/users': { title: '用户管理', desc: '查看和管理系统用户' },
-            '/users/form': { title: '新增用户', desc: '添加新的系统用户' },
+            '/users/add': { title: '新增用户', desc: '添加新的系统用户' },
             '/users/register': { title: '用户注册', desc: '用户自主注册账号' }
         };
 

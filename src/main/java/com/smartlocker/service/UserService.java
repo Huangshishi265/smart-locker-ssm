@@ -33,4 +33,9 @@ public interface UserService {
      * 删除用户
      */
     void deleteUser(Long id);
+
+    /**
+     * 用户登录（校验用户名密码）
+     */
+    User login(String username, String password);
 }

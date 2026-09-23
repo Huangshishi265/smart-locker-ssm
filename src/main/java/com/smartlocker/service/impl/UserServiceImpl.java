@@ -57,6 +57,14 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("用户名已存在");
         }
 
+        // 密码 MD5 加密存储（登录校验用 md5(password) 比对，必须一致，否则新用户无法登录）
+        user.setPassword(md5(user.getPassword()));
+
+        // 设置默认角色（表单未传时默认普通用户，避免 role 为 NULL 触发非空约束）
+        if (user.getRole() == null) {
+            user.setRole(2);
+        }
+
         // 设置默认状态
         if (user.getStatus() == null) {
             user.setStatus(1);
@@ -88,6 +96,18 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        // 密码：留空则不修改，否则 MD5 加密后再存
+        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+            user.setPassword(md5(user.getPassword()));
+        } else {
+            user.setPassword(null); // 空密码 → 不更新密码字段
+        }
+
+        // 角色未传时保持原角色
+        if (user.getRole() == null) {
+            user.setRole(existUser.getRole());
+        }
+
         // 调用DAO层
         userDao.update(user);
     }
@@ -108,5 +128,41 @@ public class UserServiceImpl implements UserService {
 
         // 调用DAO层
         userDao.deleteById(id);
+    }
+
+    @Override
+    public User login(String username, String password) {
+        if (username == null || username.trim().isEmpty() || password == null || password.isEmpty()) {
+            throw new BusinessException("用户名和密码不能为空");
+        }
+
+        User user = userDao.selectByUsername(username.trim());
+        if (user == null) {
+            throw new BusinessException("用户名或密码错误");
+        }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new BusinessException("账号已被禁用");
+        }
+        if (!md5(password).equals(user.getPassword())) {
+            throw new BusinessException("用户名或密码错误");
+        }
+        return user;
+    }
+
+    /**
+     * MD5 加密（与初始化脚本中的密码存储方式保持一致）
+     */
+    private String md5(String input) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] bytes = md.digest(input.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            throw new BusinessException("密码加密失败");
+        }
     }
 }

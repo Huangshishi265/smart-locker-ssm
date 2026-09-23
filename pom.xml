@@ -154,6 +154,13 @@
       <version>${jackson.version}</version>
     </dependency>
 
+    <!-- ==================== HTTP客户端与工具库（AI 客服调用智谱 API） ==================== -->
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>5.8.26</version>
+    </dependency>
+
     <!-- ==================== 日志框架 ==================== -->
     <!-- SLF4J日志门面 -->
     <dependency>

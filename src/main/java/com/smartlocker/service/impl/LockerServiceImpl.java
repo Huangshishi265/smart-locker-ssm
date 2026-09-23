@@ -1,15 +1,16 @@
 package com.smartlocker.service.impl;
 
-import com.smartlocker.dao.LockerBoxDao;
+import com.smartlocker.dao.BoxDao;
 import com.smartlocker.dao.LockerDao;
+import com.smartlocker.entity.Box;
 import com.smartlocker.entity.Locker;
-import com.smartlocker.entity.LockerBox;
 import com.smartlocker.exception.BusinessException;
 import com.smartlocker.service.LockerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ public class LockerServiceImpl implements LockerService {
     @Autowired
     private LockerDao lockerDao;
 
-    @Autowired  // ✅ 新增：注入LockerBoxDao
-    private LockerBoxDao lockerBoxDao;
+    @Autowired
+    private BoxDao boxDao;
 
     @Override
     public List<Locker> getAllLockers() {
@@ -51,13 +52,13 @@ public class LockerServiceImpl implements LockerService {
     }
 
     @Override
-    public List<LockerBox> getLockerBoxes(Long lockerId) {
-        return lockerBoxDao.selectByLockerId(lockerId);  // ✅ 修复：直接使用DAO查询
+    public List<Box> getLockerBoxes(Long lockerId) {
+        return boxDao.selectByLockerId(lockerId);
     }
 
     @Override
     public Map<String, Object> getBoxStats(Long lockerId) {
-        return lockerDao.selectBoxStats(lockerId);
+        return boxDao.selectBoxStats(lockerId);
     }
 
     @Override
@@ -80,9 +81,36 @@ public class LockerServiceImpl implements LockerService {
         if (locker.getStatus() == null) {
             locker.setStatus(1);
         }
+        if (locker.getRepairStatus() == null) {
+            locker.setRepairStatus(0);
+        }
 
         // 插入快递柜
         lockerDao.insert(locker);
+
+        // 初始化柜格（小/中/大），柜格编号 A1.. / B1.. / C1..
+        int s = smallCount == null ? 0 : smallCount;
+        int m = mediumCount == null ? 0 : mediumCount;
+        int l = largeCount == null ? 0 : largeCount;
+
+        for (int i = 1; i <= s; i++) {
+            boxDao.insert(buildBox(locker.getId(), "A" + i, "SMALL"));
+        }
+        for (int i = 1; i <= m; i++) {
+            boxDao.insert(buildBox(locker.getId(), "B" + i, "MEDIUM"));
+        }
+        for (int i = 1; i <= l; i++) {
+            boxDao.insert(buildBox(locker.getId(), "C" + i, "LARGE"));
+        }
+    }
+
+    private Box buildBox(Long lockerId, String boxNumber, String boxSize) {
+        Box box = new Box();
+        box.setLockerId(lockerId);
+        box.setBoxNumber(boxNumber);
+        box.setBoxSize(boxSize);
+        box.setStatus(1); // 空闲
+        return box;
     }
 
     @Override
@@ -147,7 +175,11 @@ public class LockerServiceImpl implements LockerService {
             throw new BusinessException("快递柜不存在");
         }
 
-        throw new BusinessException("该功能在当前版本中不可用");
+        locker.setRepairStatus(1);   // 待维修
+        locker.setRepairDesc(repairDesc);
+        locker.setRepairTime(new Date());
+        locker.setOperatorId(operatorId);
+        lockerDao.update(locker);
     }
 
     @Override
@@ -162,13 +194,15 @@ public class LockerServiceImpl implements LockerService {
             throw new BusinessException("快递柜不存在");
         }
 
-        throw new BusinessException("该功能在当前版本中不可用");
+        locker.setRepairStatus(3);   // 已维修
+        locker.setRepairTime(new Date());
+        locker.setOperatorId(operatorId);
+        lockerDao.update(locker);
     }
 
     @Override
     public List<Locker> getBrokenLockers() {
-        // ✅ 修复：简化为查询状态为禁用的快递柜
-        return lockerDao.selectByCondition(null, null, 0, null, null);
+        return lockerDao.selectBroken();
     }
 
     @Override

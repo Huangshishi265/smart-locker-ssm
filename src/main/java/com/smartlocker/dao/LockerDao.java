@@ -1,11 +1,9 @@
 package com.smartlocker.dao;
 
 import com.smartlocker.entity.Locker;
-import com.smartlocker.entity.LockerBox;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 快递柜DAO接口
@@ -57,7 +55,7 @@ public interface LockerDao {
     int countByStatus(@Param("status") Integer status);
 
     /**
-     * 查询快递柜柜格统计信息
+     * 查询故障快递柜（待维修/维修中）
      */
-    Map<String, Object> selectBoxStats(@Param("lockerId") Long lockerId);  // ✅ 新增
+    List<Locker> selectBroken();
 }

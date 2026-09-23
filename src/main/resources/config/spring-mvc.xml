@@ -28,6 +28,30 @@
 
     <!-- 配置静态资源处理 -->
     <mvc:resources mapping="/static/**" location="/static/"/>
+    <mvc:resources mapping="/css/**" location="/static/css/"/>
+    <mvc:resources mapping="/js/**" location="/static/js/"/>
+    <mvc:resources mapping="/images/**" location="/static/images/"/>
+    <mvc:resources mapping="/uploads/**" location="/static/uploads/"/>
+
+    <!-- 登录拦截器：未登录用户访问后台页面时重定向到登录页 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/"/>
+            <mvc:exclude-mapping path="/static/**"/>
+            <mvc:exclude-mapping path="/css/**"/>
+            <mvc:exclude-mapping path="/js/**"/>
+            <mvc:exclude-mapping path="/images/**"/>
+            <mvc:exclude-mapping path="/uploads/**"/>
+            <mvc:exclude-mapping path="/users/register"/>
+            <mvc:exclude-mapping path="/assistant"/>
+            <mvc:exclude-mapping path="/assistant/chat"/>
+            <mvc:exclude-mapping path="/404"/>
+            <mvc:exclude-mapping path="/error"/>
+            <bean class="com.smartlocker.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
     <!-- 配置视图解析器（JSP） -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

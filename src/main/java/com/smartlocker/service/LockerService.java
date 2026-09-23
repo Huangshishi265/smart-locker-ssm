@@ -1,7 +1,7 @@
 package com.smartlocker.service;
 
+import com.smartlocker.entity.Box;
 import com.smartlocker.entity.Locker;
-import com.smartlocker.entity.LockerBox;
 
 import java.util.List;
 import java.util.Map;
@@ -65,7 +65,7 @@ public interface LockerService {
     /**
      * 查询快递柜的柜格列表
      */
-    List<LockerBox> getLockerBoxes(Long lockerId);
+    List<Box> getLockerBoxes(Long lockerId);
 
     /**
      * 查询快递柜柜格统计信息
